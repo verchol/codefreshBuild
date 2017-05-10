@@ -1,0 +1,46 @@
+version: '1.0'
+
+steps:
+  build_slim:
+    type: build
+    image_name: verchol/test
+    tag: latest-slim
+
+  build_monolith:
+    type: build
+    image_name: verchol/test1
+    tag: latest
+    working_directory: monolith
+
+  test_slim:
+    image: ${{build_slim}}
+    commands:
+      # Test APP_DEBUG
+      - echo 'works' && ls
+
+  push_slim:
+    type: push
+    candidate: ${{build_slim}}
+    tag: ${{CF_BRANCH_TAG_NORMALIZED}}-slim
+
+  push_monolith:
+    type: push
+    candidate: ${{build_monolith}}
+    tag: ${{CF_BRANCH_TAG_NORMALIZED}}
+
+
+    # # Test HTTP/HTTPS redirection
+    # - docker run -d --name fpm vacasa/fpm:latest
+    # - docker run -d --name apache --link fpm:php -p 81:80 vacasa/fpm:latest apache2ctl -D FOREGROUND
+    # - docker run -d --name nginx --link fpm:php -p 82:80 vacasa/fpm:latest nginx
+    # - curl -s localhost:81/ping | grep pong
+    # - curl -s --header "X-Forwarded-Proto:https" localhost:81/ping | grep pong
+    # - curl -s --header "X-Forwarded-Proto:http" localhost:81/ping | grep "301 Moved Permanently"
+    # - curl -s localhost:82/ping | grep pong
+    # - curl -s --header "X-Forwarded-Proto:https" localhost:82/ping | grep pong
+    # - curl -s --header "X-Forwarded-Proto:http" localhost:82/ping | grep "301 Moved Permanently"
+
+    # # Test AUTH_USER checks
+    # - docker run -d --name nginxauth --link fpm:php -p 83:80 --env AUTH_USER=foo --env AUTH_PASS=bar vacasa/fpm:latest nginx
+    # - curl -s localhost:83/ping | grep "401 Authorization Required"
+    # - curl -s -u foo:bar localhost:83/ping | grep pong
