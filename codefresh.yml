@@ -3,14 +3,14 @@ version: '1.0'
 steps:
   build_slim:
     type: build
-    image_name: verchol/test
-    tag: latest-slim
+    image_name: verchol/base
+    tag: master
 
   build_monolith:
     type: build
     image_name: verchol/test1
     tag: latest
-    working_directory: ./monolith
+    working_directory: monolith
 
   test_slim:
     image: ${{build_slim}}
